@@ -6,9 +6,9 @@ load("@io_bazel_rules_docker//docker/util:run.bzl", "container_run_and_commit_la
 
 genrule(
     name = "kustomize_bin",
-    srcs = ["@kustomize//file:kustomize.tar.gz"],
+    srcs = ["@kustomize//file"],
     outs = ["kustomize"],
-    cmd = "tar --no-same-owner -C $(GENDIR)/operator -xf $(location @kustomize//file:kustomize.tar.gz)",
+    cmd = "tar -C $(@D) -xf $(location @kustomize//file)",
 )
 
 # OPERATOR
