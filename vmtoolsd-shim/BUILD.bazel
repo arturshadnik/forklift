@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "vmtoolsd-shim_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/konveyor/forklift-controller/vmtoolsd-shim",
+    visibility = ["//visibility:private"],
+    deps = ["//vmtoolsd-shim/cmd"],
+)
+
+go_binary(
+    name = "vmtoolsd-shim",
+    embed = [":vmtoolsd-shim_lib"],
+    visibility = ["//visibility:public"],
+)

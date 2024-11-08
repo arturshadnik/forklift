@@ -1,6 +1,7 @@
 load(
     "@io_bazel_rules_docker//container:container.bzl",
     "container_image",
+    "container_layer",
     "container_push",
 )
 load(
@@ -79,12 +80,22 @@ container_run_and_commit_layer(
     image = ":virt-v2v-image.tar",
 )
 
+container_layer(
+    name = "vmtoolsd-shim-binary",
+    files = {
+        "@forklift//vmtoolsd-shim:vmtoolsd-shim": "/usr/local/bin/vmtoolsd-shim",
+    },
+    mode = "0755",
+    visibility = ["//visibility:private"],
+)
+
 container_image(
     name = "virt-v2v-layer",
     base = ":virt-v2v-image",
     layers = [
         ":no-ems-in-fips",
         ":ca-certificate-from-secret",
+        ":vmtoolsd-shim-binary",
     ],
     visibility = ["//visibility:public"],
 )
