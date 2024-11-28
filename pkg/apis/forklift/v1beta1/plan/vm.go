@@ -39,6 +39,9 @@ type VM struct {
 	// Selected InstanceType that will override the VM properties.
 	// +optional
 	InstanceType string `json:"instanceType,omitempty"`
+	// ConfigMap containing ovfenv.xml.
+	// +optional
+	OvaEnvConfigMap core.ObjectReference `json:"ovaEnvConfigMap" ref:"ConfigMap"`
 }
 
 // Find a Hook for the specified step.

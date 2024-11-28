@@ -1854,6 +1854,10 @@ func (r *KubeVirt) podVolumeMounts(vmVolumes []cnv.Volume, configMap *core.Confi
 	}
 
 	for i, v := range vmVolumes {
+		// skip non-persistent volumes
+		if v.PersistentVolumeClaim == nil {
+			continue
+		}
 		pvc := pvcsByName[v.PersistentVolumeClaim.ClaimName]
 		vol := core.Volume{
 			Name: pvc.Name,
@@ -2033,6 +2037,11 @@ func (r *KubeVirt) libvirtDomain(vmCr *VirtualMachine, pvcs []*core.PersistentVo
 	// should be fixed properly in the future.
 	libvirtDisks := make([]libvirtxml.DomainDisk, 0)
 	for i, vol := range vmCr.Spec.Template.Spec.Volumes {
+		// skip non-persistent volumes
+		if vol.PersistentVolumeClaim == nil {
+			continue
+		}
+
 		diskSource := libvirtxml.DomainDiskSource{}
 
 		pvc := pvcsByName[vol.PersistentVolumeClaim.ClaimName]

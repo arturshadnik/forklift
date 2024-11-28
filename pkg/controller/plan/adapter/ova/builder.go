@@ -241,7 +241,7 @@ func (r *Builder) VirtualMachine(vmRef ref.Ref, object *cnv.VirtualMachineSpec, 
 	if err != nil {
 		return
 	}
-
+	r.mapEnv(vmRef, object)
 	return
 }
 
@@ -415,6 +415,29 @@ func (r *Builder) mapDisks(vm *model.VM, persistentVolumeClaims []*core.Persiste
 	}
 	object.Template.Spec.Volumes = kVolumes
 	object.Template.Spec.Domain.Devices.Disks = kDisks
+}
+
+func (r *Builder) mapEnv(vmRef ref.Ref, object *cnv.VirtualMachineSpec) {
+	planVm, found := r.Plan.Spec.FindVM(vmRef)
+	if !found || planVm.OvaEnvConfigMap.Name == "" {
+		return
+	}
+
+	object.Template.Spec.Volumes = append(object.Template.Spec.Volumes, cnv.Volume{
+		Name: "ovfenv-volume",
+		VolumeSource: cnv.VolumeSource{
+			ConfigMap: &cnv.ConfigMapVolumeSource{
+				LocalObjectReference: core.LocalObjectReference{
+					Name: planVm.OvaEnvConfigMap.Name,
+				},
+			},
+		},
+	})
+
+	object.Template.Spec.Domain.Devices.Disks = append(object.Template.Spec.Domain.Devices.Disks, cnv.Disk{
+		Name:   "ovfenv-volume",
+		Serial: "ovfenv",
+	})
 }
 
 // Build tasks.
